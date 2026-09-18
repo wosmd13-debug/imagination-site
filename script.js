@@ -7,22 +7,6 @@
   if (!stageEl || !artEl || !textEl || !choicesEl) return;
 
   const scenes = {
-    intro: `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
-      <rect width="320" height="180" fill="url(#skyNight)"/>
-      <rect x="18" y="18" width="100" height="76" rx="4" fill="#1c110a" stroke="#5a3420" stroke-width="3"/>
-      <rect x="24" y="24" width="88" height="64" fill="url(#skyDusk)"/>
-      <circle class="a-pulse" cx="150" cy="52" r="24" fill="url(#sunGlow)"/>
-      <path d="M150 100 Q168 66 186 100 L186 122 L150 122 Z" fill="#5a3420"/>
-      <rect x="164" y="122" width="8" height="26" fill="#3a2414"/>
-      <ellipse cx="168" cy="150" rx="34" ry="6" fill="#000" opacity="0.3"/>
-      <path d="M40 150 Q40 104 96 104 Q120 104 120 128 L120 150 Z" fill="#2a1710" opacity="0.75"/>
-      <rect x="235" y="128" width="38" height="24" rx="5" fill="#e0785a"/>
-      <path d="M273 132 q13 0 13 10 q0 10 -13 10" fill="none" stroke="#e0785a" stroke-width="4"/>
-      <path class="a-rise" d="M244 126 q4 -10 0 -18" stroke="#f0c869" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-      <path class="a-rise" style="animation-delay:.6s" d="M258 126 q-4 -10 0 -18" stroke="#f0c869" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-      <circle class="a-twinkle" cx="280" cy="50" r="2" fill="#f0c869"/>
-      <circle class="a-twinkle" style="animation-delay:.5s" cx="30" cy="110" r="1.8" fill="#f0c869"/>
-    </svg>`,
     start: `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
       <rect width="320" height="180" fill="url(#skyDusk)"/>
       <circle class="a-pulse" cx="250" cy="70" r="46" fill="url(#sunGlow)"/>
@@ -168,7 +152,7 @@
 
   const story = {
     intro: {
-      text: '오늘 하루도 고생 많으셨어요. 오늘은 좀 어떠셨나요?<br>저는 밀린 추억들을 정리하느라, 살짝 지친 채로 이 자리를 지키고 있었어요.<br>씻고 나와서 잠깐 쉬려던 참이셨죠 — 마침 잘 오셨어요.',
+      text: '오늘 하루 고생 많으셨네요.<br>오늘은 좀 어떠셨나요?<br>저는 야근중에 있어서 살짝 지친 상태네요.',
       choices: [
         { label: '네, 잠깐 앉았다 갈게요', next: 'start' },
       ],
@@ -226,7 +210,8 @@
   function fillStage(id) {
     const node = story[id];
 
-    artEl.innerHTML = scenes[id];
+    artEl.innerHTML = scenes[id] || '';
+    artEl.style.display = scenes[id] ? '' : 'none';
 
     textEl.innerHTML = node.ending
       ? `<span class="ending-badge">추억 한 조각 · ${node.ending}</span><br>${node.text}`
