@@ -154,7 +154,8 @@
     intro: {
       text: '오늘 하루 고생 많으셨네요.<br>오늘은 좀 어떠셨나요?<br>저는 야근중에 있어서 살짝 지친 상태네요.',
       choices: [
-        { label: '네, 잠깐 앉았다 갈게요', next: 'start' },
+        { label: '저도 야근중이에요.', next: 'start' },
+        { label: '오늘은 썩 괜찮은 하루였어요.', next: 'start' },
       ],
     },
     start: {
