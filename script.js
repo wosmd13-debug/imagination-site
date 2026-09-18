@@ -159,7 +159,7 @@
 })();
 
 // 스크롤 등장 애니메이션
-document.querySelectorAll('.stories, .gallery, .constellation, .intro').forEach((el) => {
+document.querySelectorAll('.intro').forEach((el) => {
   el.classList.add('reveal');
 });
 
@@ -176,63 +176,3 @@ const observer = new IntersectionObserver(
 );
 
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-// 나만의 별자리 캔버스
-(function constellation() {
-  const canvas = document.getElementById('constellation-canvas');
-  const ctx = canvas.getContext('2d');
-  const resetBtn = document.getElementById('reset-btn');
-  let points = [];
-
-  function resize() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-    render();
-  }
-
-  function render(t = 0) {
-    const rect = canvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
-
-    ctx.strokeStyle = 'rgba(169,127,240,0.55)';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    points.forEach((p, i) => {
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    });
-    ctx.stroke();
-
-    points.forEach((p, i) => {
-      const twinkle = 0.6 + 0.4 * Math.sin(t / 400 + i);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,154,214,${twinkle})`;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 6.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,154,214,${0.12 * twinkle})`;
-      ctx.fill();
-    });
-  }
-
-  function loop(t) {
-    render(t);
-    requestAnimationFrame(loop);
-  }
-
-  canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    points.push({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  });
-
-  resetBtn.addEventListener('click', () => {
-    points = [];
-  });
-
-  window.addEventListener('resize', resize);
-  resize();
-  requestAnimationFrame(loop);
-})();
