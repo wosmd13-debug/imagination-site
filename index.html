@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMAGINARIUM · 상상이 현실이 되는 곳</title>
+<meta name="description" content="상상 속 이야기와 그림, 그리고 당신만의 별자리를 만드는 인터랙티브 공간">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<header class="site-header">
+  <div class="logo">IMAGINARIUM</div>
+  <nav>
+    <a href="#stories">이야기</a>
+    <a href="#gallery">그림</a>
+    <a href="#constellation">별자리</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <p class="eyebrow">WELCOME TO YOUR OWN WORLD</p>
+    <h1>상상이<br>현실이 되는 곳</h1>
+    <p class="hero-sub">머릿속에서만 존재하던 풍경들을 이곳에 풀어놓습니다.<br>이야기가 되고, 그림이 되고, 당신의 별자리가 됩니다.</p>
+    <a href="#stories" class="scroll-cue" aria-label="아래로 스크롤">
+      <span></span>
+    </a>
+  </section>
+
+  <section class="intro">
+    <p>
+      상상은 증명할 필요가 없습니다.<br>
+      그저 <em>존재</em>하면 됩니다.
+    </p>
+  </section>
+
+  <section id="stories" class="stories">
+    <h2 class="section-title"><span class="num">01</span>이야기</h2>
+    <p class="section-desc">클릭하면 이야기가 펼쳐집니다.</p>
+
+    <div class="story-grid">
+
+      <article class="story-card" tabindex="0">
+        <div class="story-face story-front">
+          <h3>구름을 삼킨 소년</h3>
+          <p class="story-teaser">어느 날 하늘이 통째로 사라졌다.</p>
+        </div>
+        <div class="story-face story-back">
+          <p>소년은 배가 고파 손에 잡히는 구름을 한 움큼 삼켰다. 그날 이후 그의 숨결에서는 비 냄새가 났고, 화가 나면 정수리에서 천둥이 쳤다. 마을 사람들은 그를 무서워했지만, 가뭄이 든 해에는 언제나 그의 집 앞에 줄을 섰다.</p>
+        </div>
+      </article>
+
+      <article class="story-card" tabindex="0">
+        <div class="story-face story-front">
+          <h3>시간을 파는 상점</h3>
+          <p class="story-teaser">문을 열면 늘 다른 계절이었다.</p>
+        </div>
+        <div class="story-face story-back">
+          <p>주인은 낡은 저울에 손님의 오후를 올려놓고, 그만큼의 시간을 다른 병에 담아 팔았다. 어떤 이는 지루한 월요일을 팔아 첫사랑의 여름을 샀고, 어떤 이는 그 반대를 했다. 상점은 늘 그 자리에 있었지만, 아무도 두 번 같은 문으로 들어간 적이 없다.</p>
+        </div>
+      </article>
+
+      <article class="story-card" tabindex="0">
+        <div class="story-face story-front">
+          <h3>달의 뒷면에 사는 우체부</h3>
+          <p class="story-teaser">그는 답장이 오지 않는 편지만 배달한다.</p>
+        </div>
+        <div class="story-face story-back">
+          <p>사람들이 마음속으로만 쓰고 부치지 못한 말들이 밤마다 달의 뒷면으로 날아간다. 우체부는 그것들을 모아 별의 주소로 다시 보낸다. 그래서 유난히 반짝이는 별이 있다면, 그것은 누군가 끝내 전하지 못한 진심일지도 모른다.</p>
+        </div>
+      </article>
+
+      <article class="story-card" tabindex="0">
+        <div class="story-face story-front">
+          <h3>물고기가 나는 도시</h3>
+          <p class="story-teaser">비가 오면 거리 대신 하늘이 헤엄쳤다.</p>
+        </div>
+        <div class="story-face story-back">
+          <p>그 도시에서는 장마철마다 물고기들이 지붕 위로 떠올라 골목과 골목 사이를 유영했다. 아이들은 우산 대신 그물을 들고 나가 반짝이는 비늘 하나를 손끝으로 스치는 것을 여름의 인사로 여겼다.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery">
+    <h2 class="section-title"><span class="num">02</span>그림</h2>
+    <p class="section-desc">말로 다 못한 것들은 그림으로.</p>
+
+    <div class="gallery-grid">
+
+      <figure class="art-card float-1">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="moonGrad" cx="35%" cy="35%">
+              <stop offset="0%" stop-color="#fff6d9"/>
+              <stop offset="100%" stop-color="#f4c95d"/>
+            </radialGradient>
+          </defs>
+          <circle cx="100" cy="100" r="55" fill="url(#moonGrad)"/>
+          <circle cx="122" cy="90" r="55" fill="var(--bg-2)"/>
+          <circle cx="45" cy="50" r="2.5" fill="#fff"/>
+          <circle cx="30" cy="90" r="1.6" fill="#fff"/>
+          <circle cx="165" cy="140" r="2" fill="#fff"/>
+          <circle cx="150" cy="40" r="1.4" fill="#fff"/>
+        </svg>
+        <figcaption>초승달의 마음</figcaption>
+      </figure>
+
+      <figure class="art-card float-2">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="islandGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8b6bd6"/>
+              <stop offset="100%" stop-color="#4b2e83"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="100" cy="120" rx="70" ry="18" fill="url(#islandGrad)"/>
+          <path d="M40 120 Q100 90 160 120 Q100 108 40 120 Z" fill="#3a2361"/>
+          <line x1="95" y1="60" x2="95" y2="95" stroke="#5d3c9c" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="95" cy="48" r="22" fill="#a97ff0"/>
+          <circle cx="75" cy="60" r="14" fill="#a97ff0"/>
+          <circle cx="118" cy="58" r="15" fill="#a97ff0"/>
+        </svg>
+        <figcaption>떠 있는 섬</figcaption>
+      </figure>
+
+      <figure class="art-card float-3">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="portalGrad" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#ff9ad6"/>
+              <stop offset="55%" stop-color="#a06bff"/>
+              <stop offset="100%" stop-color="#241243"/>
+            </radialGradient>
+          </defs>
+          <circle cx="100" cy="100" r="70" fill="url(#portalGrad)"/>
+          <circle cx="100" cy="100" r="52" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="34" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="16" fill="#1a0d33"/>
+        </svg>
+        <figcaption>어딘가로 통하는 문</figcaption>
+      </figure>
+
+      <figure class="art-card float-1">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="100" rx="58" ry="34" fill="#7fb2e0" opacity="0.9"/>
+          <path d="M42 100 Q30 90 38 78" stroke="#7fb2e0" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M158 100 Q170 88 160 76" stroke="#7fb2e0" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <circle cx="128" cy="90" r="3" fill="#1a0d33"/>
+          <ellipse cx="60" cy="150" rx="30" ry="8" fill="#fff" opacity="0.5"/>
+          <ellipse cx="140" cy="160" rx="24" ry="6" fill="#fff" opacity="0.4"/>
+        </svg>
+        <figcaption>구름 사이를 나는 고래</figcaption>
+      </figure>
+
+    </div>
+  </section>
+
+  <section id="constellation" class="constellation">
+    <h2 class="section-title"><span class="num">03</span>나만의 별자리</h2>
+    <p class="section-desc">밤하늘을 클릭해서 당신만의 별자리를 그려보세요.</p>
+    <div class="canvas-wrap">
+      <canvas id="constellation-canvas"></canvas>
+      <button id="reset-btn" type="button">다시 그리기</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>IMAGINARIUM · 상상하는 만큼 세계는 넓어집니다</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
