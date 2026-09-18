@@ -3,7 +3,8 @@
   const stageEl = document.getElementById('adventure-stage');
   const textEl = document.getElementById('adventure-text');
   const choicesEl = document.getElementById('adventure-choices');
-  if (!stageEl || !textEl || !choicesEl) return;
+  const sceneUseEl = document.getElementById('scene-use');
+  if (!stageEl || !textEl || !choicesEl || !sceneUseEl) return;
 
   const story = {
     start: {
@@ -58,6 +59,9 @@
 
   function fillStage(id) {
     const node = story[id];
+
+    sceneUseEl.setAttribute('href', `#scene-${id}`);
+    sceneUseEl.setAttribute('xlink:href', `#scene-${id}`);
 
     textEl.innerHTML = node.ending
       ? `<span class="ending-badge">추억 한 조각 · ${node.ending}</span><br>${node.text}`
