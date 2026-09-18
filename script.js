@@ -157,22 +157,3 @@
 
   renderNode('start', false);
 })();
-
-// 스크롤 등장 애니메이션
-document.querySelectorAll('.intro').forEach((el) => {
-  el.classList.add('reveal');
-});
-
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.15 }
-);
-
-document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
