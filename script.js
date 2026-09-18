@@ -37,9 +37,10 @@
 
 // 분기형 이야기
 (function adventure() {
+  const stageEl = document.getElementById('adventure-stage');
   const textEl = document.getElementById('adventure-text');
   const choicesEl = document.getElementById('adventure-choices');
-  if (!textEl || !choicesEl) return;
+  if (!stageEl || !textEl || !choicesEl) return;
 
   const story = {
     start: {
@@ -103,40 +104,58 @@
     },
   };
 
-  function renderNode(id) {
+  function fillStage(id) {
     const node = story[id];
 
-    textEl.classList.remove('in');
+    textEl.innerHTML = node.ending
+      ? `<span class="ending-badge">ENDING · ${node.ending}</span><br>${node.text}`
+      : node.text;
     choicesEl.innerHTML = '';
 
-    setTimeout(() => {
-      textEl.innerHTML = node.ending
-        ? `<span class="ending-badge">ENDING · ${node.ending}</span><br>${node.text}`
-        : node.text;
-      textEl.classList.add('in');
+    if (node.ending) {
+      const restartBtn = document.createElement('button');
+      restartBtn.className = 'choice-btn restart';
+      restartBtn.type = 'button';
+      restartBtn.textContent = '처음부터 다시';
+      restartBtn.addEventListener('click', () => renderNode('start'));
+      choicesEl.appendChild(restartBtn);
+      return;
+    }
 
-      if (node.ending) {
-        const restartBtn = document.createElement('button');
-        restartBtn.className = 'choice-btn restart';
-        restartBtn.type = 'button';
-        restartBtn.textContent = '처음부터 다시';
-        restartBtn.addEventListener('click', () => renderNode('start'));
-        choicesEl.appendChild(restartBtn);
-        return;
-      }
-
-      node.choices.forEach((choice) => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.type = 'button';
-        btn.textContent = choice.label;
-        btn.addEventListener('click', () => renderNode(choice.next));
-        choicesEl.appendChild(btn);
-      });
-    }, 200);
+    node.choices.forEach((choice) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.type = 'button';
+      btn.textContent = choice.label;
+      btn.addEventListener('click', () => renderNode(choice.next));
+      choicesEl.appendChild(btn);
+    });
   }
 
-  renderNode('start');
+  function renderNode(id, animate = true) {
+    if (!animate) {
+      fillStage(id);
+      return;
+    }
+
+    stageEl.classList.add('stage-hidden');
+
+    setTimeout(() => {
+      fillStage(id);
+      stageEl.style.transition = 'none';
+      stageEl.classList.remove('stage-hidden');
+      stageEl.style.transform = 'translateX(24px)';
+      stageEl.style.opacity = '0';
+      stageEl.offsetWidth;
+      requestAnimationFrame(() => {
+        stageEl.style.transition = '';
+        stageEl.style.transform = '';
+        stageEl.style.opacity = '';
+      });
+    }, 350);
+  }
+
+  renderNode('start', false);
 })();
 
 // 스크롤 등장 애니메이션

@@ -178,6 +178,13 @@ main { position: relative; z-index: 1; }
   padding: 6rem 2rem;
 }
 
+.stories {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .adventure {
   background: linear-gradient(155deg, var(--bg-2), var(--bg-1));
   border: 1px solid rgba(169, 127, 240, 0.25);
@@ -190,19 +197,25 @@ main { position: relative; z-index: 1; }
   gap: 2rem;
 }
 
+.adventure-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.adventure-stage.stage-hidden {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+
 .adventure-text {
   font-family: var(--serif);
   font-size: clamp(1.1rem, 2.4vw, 1.45rem);
   line-height: 2;
   margin: 0;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.adventure-text.in {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .adventure-text .ending-badge {
