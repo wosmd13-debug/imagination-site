@@ -7,63 +7,52 @@
 
   const story = {
     start: {
-      text: '눈을 뜨니 온통 보랏빛 안개다. 발밑에서 별가루가 반딧불처럼 흩어진다. 저 멀리 두 개의 문이 보인다.',
+      text: '매미 소리가 시끄럽던 여름 오후, 눈을 감으니 그 골목이 보인다. 낡은 슬레이트 지붕 아래 평상에 앉아 부채질하시던 할머니. 저 멀리서 두 가지 소리가 들려온다.',
       choices: [
-        { label: '새소리가 들리는 왼쪽 문으로 간다', next: 'forest' },
-        { label: '조용히 빛나는 오른쪽 문으로 간다', next: 'lighthouse' },
+        { label: '딸랑딸랑, 아이스크림 트럭 종소리를 따라간다', next: 'icecream' },
+        { label: '드르륵, 옆집 만화방 문 열리는 소리를 따라간다', next: 'comicshop' },
       ],
     },
-    forest: {
-      text: '문을 열자 밤의 숲이 펼쳐진다. 나무마다 작은 등불이 걸려 있고, 그 사이로 여우 한 마리가 말을 건넨다. "더 갈래, 아니면 이 등불 하나를 가져갈래?"',
+    icecream: {
+      text: '백 원짜리 동전을 꼭 쥐고 뛰어나가면, 트럭 아저씨는 늘 웃으며 하나를 더 얹어주셨다. 문방구 앞에선 친구들이 뽑기 판을 들여다보고 있다.',
       choices: [
-        { label: '더 깊이 들어간다', next: 'forestDeep' },
-        { label: '등불을 받아 든다', next: 'endingLantern' },
+        { label: '친구들과 함께 달고나 뽑기를 해본다', next: 'bbopgi' },
+        { label: '아이스크림을 들고 혼자 골목 끝까지 걸어간다', next: 'endingAlley' },
       ],
     },
-    forestDeep: {
-      text: '숲 깊은 곳, 커다란 나무 문에는 이렇게 적혀 있다. "너의 가장 오래된 기억을 두고 가라."',
+    bbopgi: {
+      text: '바늘 끝이 떨리는 순간, 옆에서 숨죽이고 지켜봐 주던 친구의 눈빛. 별 모양이 부서질까 봐 손끝에 온 신경을 모았던 그 여름의 오후.',
       choices: [
-        { label: '기억을 두고 문을 연다', next: 'endingMemory' },
-        { label: '기억을 지키고 돌아선다', next: 'endingKeep' },
+        { label: '별 모양을 무사히 떼어낸다', next: 'endingHands' },
+        { label: '결국 부서뜨리고 둘이 함께 웃는다', next: 'endingLaugh' },
       ],
     },
-    lighthouse: {
-      text: '문 너머엔 파도 없는 검은 바다 위, 홀로 빛나는 등대가 있다. 등대지기가 손짓하며 묻는다. "배를 타고 나갈래, 아니면 등대에 머물며 불을 밝힐래?"',
+    comicshop: {
+      text: '만화방 아저씨는 오늘도 낡은 선풍기를 돌리며 졸고 계셨다. 빌려온 만화책 냄새, 삐걱이는 나무 의자. 그 옆엔 오래된 라디오가 늘 켜져 있었다.',
       choices: [
-        { label: '배를 타고 나간다', next: 'lighthouseBoat' },
-        { label: '등대에 머문다', next: 'endingKeeper' },
+        { label: '만화책 속으로 푹 빠져든다', next: 'endingPaper' },
+        { label: '라디오에서 나오는 그 시절 노래를 따라 흥얼거린다', next: 'endingRadio' },
       ],
     },
-    lighthouseBoat: {
-      text: '파도 없는 바다는 이상하리만치 고요하다. 배는 스스로 방향을 안다는 듯 나아가고, 수평선 너머로 희미한 빛이 보이기 시작한다.',
-      choices: [
-        { label: '빛을 향해 계속 간다', next: 'endingHorizon' },
-        { label: '노를 멈추고 고요함에 머문다', next: 'endingStill' },
-      ],
+    endingAlley: {
+      ending: '골목의 끝',
+      text: '아이스크림이 다 녹기도 전에 도착한 골목 끝, 노을이 지고 있었다. 그 자리에 서서 바라본 하늘은 지금도 눈을 감으면 그대로다.',
     },
-    endingLantern: {
-      ending: '등불을 든 자',
-      text: '당신은 등불을 손에 쥔 채 숲을 나선다. 그 빛은 이후로도 오랫동안 당신의 길을 밝혀줄 것이다.',
+    endingHands: {
+      ending: '그때 그 손',
+      text: '별 모양을 무사히 떼어낸 순간, 친구와 나눠 먹던 자부심 가득한 웃음. 성공하지 못해도 함께라서 좋았던 그 마음을, 지금은 어디에 있을 그 손을 떠올리며 다시 느껴본다.',
     },
-    endingMemory: {
-      ending: '새로운 시작',
-      text: '당신은 가장 오래된 기억을 내려놓는다. 문이 열리고, 새로운 시작이 눈부시게 쏟아진다. 무언가를 잃었지만, 그만큼 가벼워졌다.',
+    endingLaugh: {
+      ending: '부서져도 좋았던',
+      text: '별은 결국 부서졌지만, 둘이서 터뜨린 웃음소리가 골목에 오래 울렸다. 잘하지 못해도 함께라면 괜찮았던, 그런 날들이 있었다.',
     },
-    endingKeep: {
-      ending: '지켜낸 것',
-      text: '당신은 기억을 지키기로 한다. 문은 다시 닫히고 안개 속. 하지만 당신은 안다 — 지켜야 할 것은 지켜야 한다는 것을.',
+    endingPaper: {
+      ending: '종이 냄새',
+      text: '마지막 장을 덮을 때 느껴지던 아쉬움, 다음 편이 나올 때까지 손꼽아 기다리던 여름의 시간들. 지금도 오래된 책을 펼치면 그 냄새가 난다.',
     },
-    endingKeeper: {
-      ending: '등대지기',
-      text: '당신은 등대지기가 되기로 한다. 아무도 오지 않는 밤에도, 당신의 불빛은 누군가의 길이 되어줄 것이다.',
-    },
-    endingHorizon: {
-      ending: '새로운 지평',
-      text: '수평선 너머, 한 번도 상상해보지 못한 색의 하늘이 펼쳐진다. 그곳이 어디든, 이제부터가 진짜 이야기다.',
-    },
-    endingStill: {
-      ending: '고요함 속에서',
-      text: '당신은 노를 내려놓는다. 파도도 바람도 없는 고요함 속에서, 당신은 처음으로 아무것도 하지 않아도 되는 법을 배운다.',
+    endingRadio: {
+      ending: '그 시절의 노래',
+      text: '라디오에서 흘러나오던 노래 한 소절에, 온 가족이 저녁상 앞에서 따라 부르던 밤들. 이제는 어디서도 들을 수 없지만, 마음속에선 여전히 재생되고 있다.',
     },
   };
 
@@ -71,7 +60,7 @@
     const node = story[id];
 
     textEl.innerHTML = node.ending
-      ? `<span class="ending-badge">ENDING · ${node.ending}</span><br>${node.text}`
+      ? `<span class="ending-badge">추억 한 조각 · ${node.ending}</span><br>${node.text}`
       : node.text;
     choicesEl.innerHTML = '';
 
@@ -79,7 +68,7 @@
       const restartBtn = document.createElement('button');
       restartBtn.className = 'choice-btn restart';
       restartBtn.type = 'button';
-      restartBtn.textContent = '처음부터 다시';
+      restartBtn.textContent = '다시 그 골목으로';
       restartBtn.addEventListener('click', () => renderNode('start'));
       choicesEl.appendChild(restartBtn);
       return;
