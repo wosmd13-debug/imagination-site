@@ -154,8 +154,20 @@
     intro: {
       text: '오늘 하루 고생 많으셨네요.<br>오늘은 좀 어떠셨나요?<br>저는 야근중에 있어서 살짝 지친 상태네요.',
       choices: [
-        { label: '저도 야근중이에요.', next: 'start' },
-        { label: '오늘은 썩 괜찮은 하루였어요.', next: 'start' },
+        { label: '저도 야근중이에요.', next: 'introOvertime' },
+        { label: '오늘은 썩 괜찮은 하루였어요.', next: 'introGood' },
+      ],
+    },
+    introOvertime: {
+      text: '역시, 우리 둘 다 오늘 고생이 많네요.<br>그래도 이렇게 마주쳤으니, 잠깐이라도 여기 앉아 쉬었다 가요.',
+      choices: [
+        { label: '네, 잠깐 쉬었다 갈게요', next: 'start' },
+      ],
+    },
+    introGood: {
+      text: '그 얘기를 들으니 저도 덩달아 기분이 좋아지네요.<br>오늘처럼 괜찮은 날엔, 오래된 좋은 기억 하나 꺼내보는 것도 잘 어울릴 것 같아요.',
+      choices: [
+        { label: '네, 한번 볼게요', next: 'start' },
       ],
     },
     start: {
