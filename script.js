@@ -27,16 +27,6 @@
     return '퇴근길이거나, 막 집에 도착했거나, 그 사이 어디쯤이겠네요.';
   }
 
-  const moodLine = {
-    overtime: '오늘도 "저도 야근중이에요"라고 말할 줄 알았어요. 같은 하루를 지나는 사람끼리는, 그런 건 대충 보이거든요.',
-    good: '오늘은 "썩 괜찮은 하루였어요"라고 말할 줄 알았어요. 그 한마디가 이 편지를 쓴 보람이에요.',
-  };
-
-  const workLine = {
-    satisfied: '회사는 나름 만족하며 다닌다고 하셨죠. 그 "나름" 안에 얼마나 많은 참음이 들어 있는지, 저는 알아요.',
-    money: '그냥 돈 벌려고 다닌다고 하셨죠. 그 말이 얼마나 쓸쓸하고, 또 얼마나 책임감 있는 말인지 알아요.',
-  };
-
   const pickLine = {
     clock: '그리고 세 가지 중에 낡은 시계를 고르셨죠. 시간이 늘 모자란 사람이 고르는 물건이에요. 오늘도 당신의 시간은 누군가를 위해 쓰였겠죠.',
     key: '그리고 작은 열쇠를 고르셨죠. 어딘가로 돌아가고 싶은 사람이 고르는 물건이에요. 그곳이 어디든, 문은 아직 닫히지 않았어요.',
@@ -44,26 +34,6 @@
   };
 
   const story = {
-    intro: {
-      text: '오늘 하루 고생 많으셨네요.<br>오늘은 좀 어떠셨나요?<br>저는 야근중에 있어서 살짝 지친 상태네요.',
-      choices: [
-        { label: '저도 야근중이에요.', next: 'introOvertime', set: { mood: 'overtime' } },
-        { label: '오늘은 썩 괜찮은 하루였어요.', next: 'introGood', set: { mood: 'good' } },
-      ],
-    },
-    introOvertime: {
-      text: '역시, 우리 둘 다 오늘 고생이 많네요.<br>벌어먹고 살기 참 힘들죠? 저도 매주 야근을 하면서 종종 드는 생각이에요.<br>거기 회사는 괜찮아요?',
-      choices: [
-        { label: '네 나름 만족하며 다니고 있어요', next: 'timeRead', set: { work: 'satisfied' } },
-        { label: '그냥 돈 벌려고 다니는거죠', next: 'timeRead', set: { work: 'money' } },
-      ],
-    },
-    introGood: {
-      text: '그 얘기를 들으니 저도 덩달아 기분이 좋아지네요.<br>이런 날엔 작은 마술 하나쯤 구경해도 좋겠다는 생각이 들어요.',
-      choices: [
-        { label: '네, 보여주세요', next: 'timeRead' },
-      ],
-    },
     timeRead: {
       envelope: 'sealed',
       text: () => {
@@ -88,8 +58,6 @@
       lines: (s) => [
         ['이 편지를 열고 있는 당신에게.'],
         [`지금은 ${withCopula(koreanTime())}겠네요. 맞죠?`],
-        [moodLine[s.mood]],
-        ...(s.work ? [[workLine[s.work]]] : []),
         [pickLine[s.pick]],
         ['어떤 하루였든, 이 편지를 끝까지 읽은 사람이라면 오늘도 충분히 잘 해낸 거예요.'],
         ['— 먼저 도착해 있던 사람이', 'sign'],
@@ -101,7 +69,7 @@
     closing: {
       text: '오늘 얘기는 여기까지예요.<br>다음에 또 들러주세요.',
       choices: [
-        { label: '처음으로 돌아가기', next: 'intro' },
+        { label: '처음으로 돌아가기', next: 'timeRead' },
       ],
     },
   };
@@ -111,7 +79,7 @@
 
   function fillStage(id) {
     const node = story[id];
-    if (id === 'intro') state = {};
+    if (id === 'timeRead') state = {};
 
     stageEl.classList.remove('skip');
 
@@ -176,5 +144,5 @@
 
   textEl.addEventListener('click', () => stageEl.classList.add('skip'));
 
-  renderNode('intro', false);
+  renderNode('timeRead', false);
 })();
