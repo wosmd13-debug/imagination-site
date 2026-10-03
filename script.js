@@ -43,6 +43,28 @@
     past: '예전의 나라니, 쉽게 나오는 대답이 아닌데요. 사실 이 사진엔 아무도 없어요. 저물어가는 골목에 불 켜진 창문 하나뿐이에요.<br>그런데도 지난날의 나를 떠올렸다면, 그때의 당신이 아직 저 불빛 어딘가에 남아 있다는 뜻일지도 몰라요.',
   };
 
+  const coverLine = {
+    loved: '이상하죠. 겉봉 글씨가 어쩐지, 아까 당신이 떠올린 그 사람의 글씨 같다는 생각이 들어요.',
+    past: '이상하죠. 겉봉 글씨가 어쩐지, 어린 시절 당신의 글씨 같다는 생각이 들어요.',
+  };
+
+  const letterLines = {
+    loved: [
+      ['오늘 늦게 이곳에 올 당신에게.'],
+      ['밥은 먹었어? 늦게까지 일하느라 또 건너뛰진 않았는지, 그게 제일 걱정이야.'],
+      ['별일 없이 지낸다면 그걸로 충분해. 잘 지내냐는 말은 못 하겠고, 그냥 하루가 너무 길지만 않았으면 좋겠어.'],
+      ['그리고 가끔은 나도 생각해줘. 많이도 말고, 오늘 같은 밤에 한 번만.'],
+      ['— 당신이 떠올린 그 사람이', 'sign'],
+    ],
+    past: [
+      ['오늘 늦게 이곳에 올 당신에게.'],
+      ['어릴 적에 밤새도록 상상하던 거 기억나? 우리는 어른이 되면 뭐든 해낼 줄 알았잖아.'],
+      ['막상 되어보니 매일 버티는 게 전부라는 게 좀 웃기지. 그래도 난 네가 부끄럽지 않아.'],
+      ['오늘 하루를 버텨낸 너에게, 그때의 내가 크게 박수 치고 있어. 들리지?'],
+      ['— 예전의 당신이', 'sign'],
+    ],
+  };
+
   const pickLine = {
     clock: '그리고 세 가지 중에 낡은 시계를 고르셨죠. 시간이 늘 모자란 사람이 고르는 물건이에요. 오늘도 당신의 시간은 누군가를 위해 쓰였겠죠.',
     key: '그리고 작은 열쇠를 고르셨죠. 어딘가로 돌아가고 싶은 사람이 고르는 물건이에요. 그곳이 어디든, 문은 아직 닫히지 않았어요.',
@@ -112,11 +134,39 @@
     photoReveal: {
       text: (s) => `${photoLine[s.photo]}<br>사람은 비어 있는 곳에서도 기어코 사랑하는 걸 찾아내더라고요.`,
       choices: [
-        { label: '…그러네요', next: 'closing' },
+        { label: '…그러네요', next: 'compartment' },
+      ],
+    },
+    compartment: {
+      text: (s) => `그러고 보니 서랍 맨 아래에 칸이 하나 더 있어요. 자물쇠가 달려 있는데, 숫자 대신 시각으로 열리는 거예요.<br>아까 이곳에 도착하신 ${s.arrival}, 그 시각으로 맞춰볼게요.`,
+      choices: [
+        { label: '맞춰본다', next: 'compartmentOpen' },
+      ],
+    },
+    compartmentOpen: {
+      envelope: 'sealed',
+      text: (s) => `딸깍. 자물쇠가 열렸어요.<br>칸 안에는 봉투가 하나 들어 있어요. 겉봉에는 ‘오늘 늦게 이곳에 올 당신에게’라고만 적혀 있고요.<br>${coverLine[s.photo]}`,
+      choices: [
+        { label: '열어본다', next: 'drawerLetter' },
+        { label: '열지 않고 간직한다', next: 'keepSealed' },
+      ],
+    },
+    drawerLetter: {
+      envelope: 'open',
+      lines: (s) => letterLines[s.photo],
+      choices: [
+        { label: '편지를 접어둔다', next: 'closing' },
+      ],
+    },
+    keepSealed: {
+      envelope: 'sealed',
+      text: '열지 않는 것도 하나의 답이죠. 어떤 편지는 열지 않아야 계속 편지로 남거든요.<br>그럼 이 편지는 서랍에 다시 넣어둘게요. 열고 싶어지는 날, 그 시각에 맞춰서요.',
+      choices: [
+        { label: '그렇게 해주세요', next: 'closing' },
       ],
     },
     closing: {
-      text: '오늘은 여기까지만 열어둘게요. 서랍엔 아직 열어보지 않은 칸이 더 있어요.<br>다음에 오시면 그 칸에서 편지를 하나 꺼내올게요. 이번엔 제가 아니라, 누군가 당신에게 쓴 편지로요.',
+      text: '오늘 얘기는 여기까지예요.<br>서랍은 그대로 열어둘게요. 다음에 오시면, 저에 대해서도 조금 더 얘기해드릴게요.',
       choices: [
         { label: '처음으로 돌아가기', next: 'timeRead' },
       ],
@@ -128,7 +178,7 @@
 
   function fillStage(id) {
     const node = story[id];
-    if (id === 'timeRead') state = {};
+    if (id === 'timeRead') state = { arrival: koreanTime() };
 
     stageEl.classList.remove('skip');
 
