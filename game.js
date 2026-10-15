@@ -75,6 +75,13 @@
     return s - Math.floor(s);
   };
 
+  const lerpColor = (a, b, k) => {
+    const p = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    const [r1, g1, b1] = p(a);
+    const [r2, g2, b2] = p(b);
+    return `rgb(${Math.round(r1 + (r2 - r1) * k)}, ${Math.round(g1 + (g2 - g1) * k)}, ${Math.round(b1 + (b2 - b1) * k)})`;
+  };
+
   const koreanTime = (date = new Date()) => {
     const h = date.getHours();
     const m = date.getMinutes();
@@ -93,10 +100,13 @@
 
   const hotspots = [
     { id: 'drawer', x: 208, y: 88, w: 24, h: 28, label: '서랍', mark: [220, 86] },
+    { id: 'cup', x: 199, y: 82, w: 8, h: 6, label: '머그잔', mark: [203, 78] },
     { id: 'host', x: 178, y: 62, w: 24, h: 30, label: '야근 중인 사람', mark: [190, 58] },
     { id: 'monitor', x: 154, y: 68, w: 22, h: 20, label: '모니터', mark: [165, 64] },
+    { id: 'lamp', x: 208, y: 62, w: 24, h: 25, label: '스탠드', mark: [219, 58] },
     { id: 'clock', x: 150, y: 14, w: 24, h: 24, label: '벽시계', mark: [162, 10] },
     { id: 'window', x: 12, y: 10, w: 110, h: 54, label: '창문', mark: [66, 6] },
+    { id: 'desks', x: 12, y: 66, w: 128, h: 22, label: '빈 책상들', mark: [76, 74] },
   ];
 
   let t = 0;
@@ -111,21 +121,33 @@
   let envOpenTarget = 0;
   let glow = 0;
   let glowTarget = 0;
+  let flash = 0;
+  let flashTarget = 0;
+  let lampDark = 0;
+  let lampTarget = 0;
+  let cupWarm = 0;
+  let cupTarget = 0;
+  let wave = 0;
+  let signal = 0;
   let count = {};
   let S = {};
 
   function drawWindow() {
     rect(12, 10, 110, 54, C.frame);
-    const bands = ['#0b1024', '#10173a', '#161f4a', '#1e2a5c', '#2b3768', '#3d4577'];
-    bands.forEach((c, i) => rect(14, 12 + i * 8, 106, 8, c));
+    const night = ['#0b1024', '#10173a', '#161f4a', '#1e2a5c', '#2b3768', '#3d4577'];
+    const dusk = ['#3b3f7a', '#7a5a8a', '#c97b6a', '#e39a5c', '#f0b866', '#f7d58a'];
+    const bandColors = night.map((c, i) => lerpColor(c, dusk[i], flash));
+    bandColors.forEach((c, i) => rect(14, 12 + i * 8, 106, 8, c));
 
-    for (let i = 0; i < 22; i++) {
+    const starCount = 22 + Math.round(lampDark * 18);
+    for (let i = 0; i < starCount; i++) {
       if (((t >> 4) + i) % 7 === 0) continue;
-      rect(15 + Math.floor(noise(i) * 104), 13 + Math.floor(noise(i + 50) * 22), 1, 1, '#cfd6ff');
+      ctx.fillStyle = `rgba(207, 214, 255, ${1 - flash * 0.85})`;
+      ctx.fillRect(15 + Math.floor(noise(i) * 104), 13 + Math.floor(noise(i + 50) * 22), 1, 1);
     }
 
     circle(100, 22, 4, '#f4efd8');
-    circle(102, 21, 3, '#161f4a');
+    circle(102, 21, 3, bandColors[1]);
 
     buildings.forEach((b) => {
       const top = 62 - b.h;
@@ -133,10 +155,18 @@
       for (let wy = top + 3; wy < 60; wy += 4) {
         for (let wx = b.x + 2; wx < b.x + b.w - 1; wx += 3) {
           const slot = Math.floor(t / 300 + noise(b.id) * 5);
-          if (noise(wx * 3 + wy * 7 + slot * 13) < 0.3 + glow * 0.3) rect(wx, wy, 1, 2, '#f0c869');
+          if (noise(wx * 3 + wy * 7 + slot * 13) < 0.3 + glow * 0.3 + lampDark * 0.12) rect(wx, wy, 1, 2, '#f0c869');
         }
       }
     });
+
+    const sb = buildings[3];
+    const sx = sb.x + Math.floor(sb.w / 2) - 1;
+    const sy = 62 - sb.h + 5;
+    const signalOn = signal > 0 ? ((signal >> 3) & 1) === 0 : true;
+    ctx.fillStyle = `rgba(255, 226, 154, ${signalOn ? 0.28 + Math.sin(t / 14) * 0.08 : 0})`;
+    ctx.fillRect(sx - 1, sy - 1, 4, 6);
+    if (signalOn) rect(sx, sy, 2, 4, '#ffe29a');
 
     rect(48, 12, 2, 50, C.frame);
     rect(84, 12, 2, 50, C.frame);
@@ -153,7 +183,7 @@
     rect(cx - 8, cy - 1, 2, 2, C.ink);
     rect(cx + 6, cy - 1, 2, 2, C.ink);
 
-    const now = new Date();
+    const now = new Date(Date.now() - flash * 7.4 * 3600 * 1000 - flash * 20 * 1000);
     const sec = now.getSeconds() + now.getMilliseconds() / 1000;
     const min = now.getMinutes() + sec / 60;
     const hr = (now.getHours() % 12) + min / 60;
@@ -215,6 +245,12 @@
       rect(ex[1], 70, 1, 2, C.ink);
     }
     if (attention) rect(188, 74, 4, 1, '#b5755d');
+
+    if (wave > 0) {
+      const sway = (t >> 2) & 1;
+      rect(197, 71, 3, 9, C.shirtDark);
+      rect(196 + sway, 67, 4, 4, C.skin);
+    }
   }
 
   function drawDeskAndProps() {
@@ -227,7 +263,7 @@
 
     rect(154, 68, 22, 18, '#1a1722');
     rect(156, 70, 18, 14, C.screen);
-    [12, 9, 14].forEach((len, i) => rect(158, 72 + i * 3, len, 1, C.screenLine));
+    [12, 9, 14].forEach((len, i) => rect(158, 72 + i * 3, len, 1, i === 0 && S.firstLine ? C.lamp : C.screenLine));
     const typed = (t >> 2) % 18;
     rect(158, 81, typed, 1, C.screenLine);
     if ((t >> 3) & 1) rect(158 + typed, 80, 2, 3, C.screenLine);
@@ -244,11 +280,12 @@
     rect(194, hy2, 4, 2, C.skin);
 
     rect(200, 84, 5, 4, C.cup);
-    rect(200, 84, 5, 1, C.coffee);
+    rect(200, 84, 5, 1, lerpColor(C.coffee, '#9a6035', cupWarm));
     rect(205, 85, 1, 2, C.cup);
-    for (let i = 0; i < 3; i++) {
+    const puffs = Math.round(cupWarm * 6);
+    for (let i = 0; i < puffs; i++) {
       const p = (t / 6 + i * 5) % 14;
-      const alpha = Math.max(0, 0.55 - p / 26);
+      const alpha = Math.max(0, (0.55 - p / 26) * (0.4 + cupWarm));
       ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
       ctx.fillRect(Math.round(202 + Math.sin(t / 10 + i) * 1.5), Math.round(83 - p), 1, 1);
     }
@@ -293,9 +330,9 @@
     rect(227, 72, 1, 14, '#2a2430');
     line(227, 72, 216, 66, '#2a2430');
     rect(210, 64, 10, 5, '#3a3347');
-    rect(211, 68, 8, 1, C.lamp);
+    rect(211, 68, 8, 1, lampDark > 0.5 ? '#5a4a30' : C.lamp);
 
-    const flicker = 0.075 + glow * 0.07 + Math.sin(t / 7) * 0.008;
+    const flicker = (0.075 + glow * 0.07 + Math.sin(t / 7) * 0.008) * (1 - lampDark);
     ctx.fillStyle = `rgba(243, 201, 105, ${flicker})`;
     ctx.beginPath();
     ctx.moveTo(213, 69);
@@ -316,6 +353,16 @@
     ctx.beginPath();
     ctx.arc(165, 76, 26, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  function drawDarkness() {
+    if (lampDark < 0.01) return;
+    ctx.fillStyle = `rgba(0, 0, 14, ${0.58 * lampDark})`;
+    ctx.fillRect(0, 0, W, H);
+    if (lampDark > 0.2) {
+      ctx.fillStyle = `rgba(243, 201, 105, ${(0.5 + Math.sin(t / 6) * 0.2) * lampDark})`;
+      ctx.fillRect(210, 107, 20, 1);
+    }
   }
 
   function drawMarkers() {
@@ -343,12 +390,18 @@
     drawCabinet();
     drawEnvelope();
     drawLampAndLight();
+    drawDarkness();
 
     const vg = ctx.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, 150);
     vg.addColorStop(0, 'rgba(0, 0, 0, 0)');
     vg.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, W, H);
+
+    if (flash > 0.01) {
+      ctx.fillStyle = `rgba(255, 190, 110, ${0.16 * flash})`;
+      ctx.fillRect(0, 0, W, H);
+    }
 
     drawMarkers();
 
@@ -365,6 +418,11 @@
     envP += (envTarget - envP) * 0.07;
     envOpenP += (envOpenTarget - envOpenP) * 0.12;
     glow += (glowTarget - glow) * 0.02;
+    flash += (flashTarget - flash) * 0.05;
+    lampDark += (lampTarget - lampDark) * 0.07;
+    cupWarm += (cupTarget - cupWarm) * 0.04;
+    if (wave > 0) wave--;
+    if (signal > 0) signal--;
   }
 
   let last = 0;
@@ -441,6 +499,25 @@
   const arrival = koreanTime();
   const narrate = (text) => say('', text);
   const host = (text) => say(HOST, text);
+
+  const TOTAL_BEATS = 25;
+  const foundEl = document.getElementById('found');
+  const found = new Set();
+
+  function renderFound(pop) {
+    foundEl.innerHTML = `기억의 조각 <b>${found.size}</b> / ${TOTAL_BEATS}`;
+    if (pop) {
+      foundEl.classList.remove('pop');
+      void foundEl.offsetWidth;
+      foundEl.classList.add('pop');
+    }
+  }
+
+  function discover(id) {
+    if (found.has(id)) return;
+    found.add(id);
+    renderFound(true);
+  }
 
   const topics = [
     {
@@ -530,6 +607,7 @@
       }
       S.topics.add(remaining[pick].id);
       await remaining[pick].run();
+      discover(`topic-${remaining[pick].id}`);
     }
   }
 
@@ -546,6 +624,7 @@
       '괜찮아요. 모르겠는 날엔 오늘 밥 먹은 걸 적으면 돼요. 누군가 차려줬거나, 당신이 당신을 챙긴 거니까요.',
     ];
     await host(replies[pick]);
+    discover('notebook');
   }
 
   async function photoStory() {
@@ -560,6 +639,7 @@
       ? '그런데도 누군가를 떠올렸다면, 지금 그 사람이 그립다는 뜻일 거예요.'
       : '그런데도 지난날의 나를 떠올렸다면, 그때의 당신이 아직 저 불빛 어딘가에 남아 있다는 뜻일지도 몰라요.');
     await host('사람은 비어 있는 곳에서도 기어코 사랑하는 걸 찾아내더라고요.');
+    discover('photo');
   }
 
   const recipients = [
@@ -618,13 +698,17 @@
     await sleep(700);
     for (const page of r.pages) await say('편지', page);
     await say('편지', '— 쓰다 만 편지 중에서');
+    discover('envelope');
 
     await narrate('편지를 접자, 스탠드 불빛이 조금 따뜻해진 것 같다.');
     glowTarget = 1;
     await narrate('창밖의 불빛이 하나둘 늘어난다. 같은 시간에 깨어 있는 누군가들의 창문이다.');
     attention = true;
     await host('이 편지, 이제야 보낼 수 있겠어요. 받는 사람이 정해졌으니까요.');
-    if (S.asked) await host('아까 제게 오늘 어땠냐고 물어봐 준 거, 기억나요? 그게 이 편지의 첫 줄이 됐어요.');
+    if (S.asked) await host('아까 제게 오늘 어땠냐고 물어봐 준 거, 기억나요? 그 덕분에 이 편지를 보낼 용기가 났어요.');
+    if (S.firstLine) await host(`모니터에 정해준 첫 문장 있잖아요. “${S.firstLine}” 그 한 줄 덕분에 시작할 수 있었어요.`);
+    if (S.waved) await host('그리고 건너편 창문, 지금도 불이 켜져 있어요. 오늘은 그 불빛이 조금 다르게 보여요.');
+    if (found.size >= 18) await host('이 사무실을 이렇게 오래 둘러봐 준 사람은 처음이에요. 여기에 이야기가 이렇게 많은 줄, 저도 몰랐어요.');
     await host(r.ask);
     await host(r.wait);
     await host('들어줘서 고마워요. 이 시간에 와준 것도요.');
@@ -637,10 +721,50 @@
   function resetStory() {
     S = {};
     count = {};
+    found.clear();
+    renderFound(false);
     drawerTarget = 0;
     envTarget = 0;
     envOpenTarget = 0;
     glowTarget = 0;
+    flashTarget = 0;
+    lampTarget = 0;
+    cupTarget = 0;
+    wave = 0;
+    signal = 0;
+  }
+
+  async function clockFlashback() {
+    await narrate('초침이 멈칫하더니, 천천히 거꾸로 돌기 시작한다.');
+    flashTarget = 1;
+    await sleep(1800);
+    await narrate('사무실이 환해진다. 창밖은 해 질 녘이다. 어디선가 초인종 소리, 밥 짓는 냄새, 누군가 신발을 벗는 소리가 난다.');
+    await narrate('“다녀왔어.” 현관 쪽에서 목소리가 들린다. 누구의 목소리인지는, 당신만 알 것 같다.');
+    flashTarget = 0;
+    await sleep(1200);
+    await narrate('시계는 다시 제 시간을 가리킨다.');
+    attention = true;
+    await host('...봤어요? 저는 늘 그 목소리가 누구 건지 궁금했는데, 오늘은 당신 덕분에 들린 것 같아요.');
+  }
+
+  async function lampOffStory() {
+    await narrate('스탠드를 끈다. 사무실이 어둠에 잠긴다.');
+    lampTarget = 1;
+    await sleep(1500);
+    await narrate('어둠에 눈이 익자 창밖의 불빛과 별이 더 또렷해진다. 그리고 서랍 틈에서, 아주 희미한 빛이 새어 나온다.');
+    await host('...진짜네요. 불을 끄니까 보여요. 저 별들, 원래 다 있었는데.');
+    await narrate('스탠드를 다시 켠다.');
+    lampTarget = 0;
+    await sleep(900);
+  }
+
+  async function waveStory() {
+    await narrate('창문을 향해 손을 흔든다. 옆에서 그 사람도 따라 손을 든다.');
+    wave = 100;
+    await sleep(1300);
+    signal = 34;
+    await sleep(1300);
+    await narrate('잠시 뒤, 건너편 창문의 불이 두 번 깜빡인다.');
   }
 
   const scripts = {
@@ -650,37 +774,201 @@
         await narrate(`벽시계는 ${withObject(koreanTime())} 가리키고 있다.`);
         attention = true;
         await host('그 시계, 사실 오래전에 멈춘 건데... 이상하게 당신이 오면 움직이더라고요.');
+        discover('clock1');
       } else if (n === 2) {
         attention = true;
         await host('저는 가끔 일부러 시계를 안 봐요. 보는 순간 집에 갈 시간이 한참 지났다는 게 진짜가 돼버리거든요.');
-      } else {
-        await narrate('초침이 조용히 움직인다.');
+        discover('clock2');
+      } else if (n === 3) {
         attention = true;
-        await host('시간은 참 이상해요. 바쁠 땐 안 가고, 소중한 건 꼭 빨리 가요.');
+        await host('저 시계, 아버지가 쓰시던 거예요. 아버지도 늘 늦게 들어오셨어요.');
+        await host('어릴 땐 그게 그렇게 싫었는데, 지금은 제가 이 시간에 저 시계를 보고 있네요.');
+        await host('당신은 어릴 때, 누가 늦게 오길 기다렸어요?');
+        const pick = await choose(['부모님이요', '형제나 친구요', '기다릴 사람이 없었어요', '제가 늦게 오는 쪽이었어요']);
+        const replies = [
+          '그럼 우리, 같은 문 앞에 앉아 있었던 거네요. 현관 소리만 나도 심장이 뛰던 그 문 앞에요.',
+          '기다리는 사람이 있었다는 건, 그 시절의 당신도 누군가의 기다림 속에 있었다는 거예요.',
+          '그랬다면 그 시간이 얼마나 길었을지... 오늘만큼은 제가 여기서 기다릴게요.',
+          '그럼 누군가는 그 문 앞에서 당신을 기다렸겠네요. 이제는 그 마음이 조금 보이시죠?',
+        ];
+        await host(replies[pick]);
+        discover('clock3');
+      } else {
+        attention = true;
+        await host(n === 4 ? '이 시계, 아주 가끔 거꾸로 돌 때가 있어요. 보실래요?' : '또 보여드릴까요? 거꾸로 도는 시계요.');
+        const pick = await choose(['보고 싶어요', '다음에 볼게요']);
+        if (pick === 0) {
+          await clockFlashback();
+          discover('clock4');
+        } else {
+          await host('그래요. 보고 싶어지는 날 또 와요.');
+        }
       }
     },
+
     async monitor() {
-      if (count.monitor === 1) {
+      const n = count.monitor;
+      attention = true;
+      if (n === 1) {
         await narrate('화면에는 쓰다 만 편지가 떠 있다. ‘오늘 늦게 이곳에 올 당신에게’ 뒤로 커서만 깜빡인다.');
-        attention = true;
         await host('아, 그거... 보셨어요? 몇 주째 그 한 줄에서 못 나가고 있어요.');
         await host('누구한테 쓰는 편지인지는 정했는데, 뭐라고 시작해야 할지 모르겠어서요.');
-      } else {
-        attention = true;
+        discover('monitor1');
+      } else if (n === 2) {
         await host('다 쓰면 보내려고요. 근데 보내는 것보다 다 쓰는 게 더 무섭네요.');
-      }
-    },
-    async window() {
-      if (count.window === 1) {
-        await narrate('창밖으로 도시의 불빛이 보인다. 이 시간에도 불 켜진 창이 꽤 많다.');
-        attention = true;
-        await host('야근하다 고개를 들면 저렇게 불 켜진 창이 몇 개씩 있어요. 누군지는 모르는데, 같은 시간에 깨어 있다는 것만으로 이상하게 위로가 돼요.');
-        await narrate('어쩌면 저 창들 중 하나에서도 누군가 같은 생각을 하고 있을지 모른다.');
+        discover('monitor2');
+      } else if (n === 3) {
+        await host('혹시 한 줄만 도와줄래요? 첫 문장만 정해지면 나머지는 쓸 수 있을 것 같아서요.');
+        await narrate('커서가 깜빡인다. ‘오늘 늦게 이곳에 올 당신에게,’ 다음 줄이 비어 있다.');
+        const lines = ['오늘 하루도 고생했어요.', '사실 많이 보고 싶었어요.', '미안해요, 너무 늦어서.', '고마워요, 그동안 내내.'];
+        const pick = await choose(lines);
+        S.firstLine = lines[pick];
+        await narrate('첫 문장이 화면에 천천히 채워진다.');
+        await host('...맞아요. 이 문장이었네요.');
+        discover('monitor3');
+      } else if (n === 4) {
+        await host('그거 알아요? 제 휴대폰에는 보내지 못한 메시지가 서른일곱 개 있어요.');
+        await host('보내지 못한 이유는 다 달라요. 늦어서, 어색해서, 괜히 부담 줄까 봐.');
+        const pick = await choose(['저도 있어요', '저는 보내는 편이에요']);
+        await host(pick === 0
+          ? '있죠, 다들. 그 메시지들은 다 어디로 가는 걸까요. 어쩌면 마음속에 쌓여서 퇴근이 이렇게 늦어지는 걸지도 몰라요.'
+          : '대단해요. 그럼 그 용기, 오늘 저한테 조금만 나눠줘요.');
+        discover('monitor4');
       } else {
-        attention = true;
-        await host('저 불빛들 중에 당신이 사는 동네도 있을까요?');
+        await host(S.firstLine ? `화면에 “${S.firstLine}” 그 한 줄이 아직 반짝이고 있어요.` : '화면에 한 줄이 아직 깜빡이고 있어요.');
       }
     },
+
+    async window() {
+      const n = count.window;
+      attention = true;
+      if (n === 1) {
+        await narrate('창밖으로 도시의 불빛이 보인다. 이 시간에도 불 켜진 창이 꽤 많다.');
+        await host('야근하다 고개를 들면 저렇게 불 켜진 창이 몇 개씩 있어요. 누군지는 모르는데, 같은 시간에 깨어 있다는 것만으로 이상하게 위로가 돼요.');
+        await narrate('건너편 건물에서 유난히 오래 켜져 있는 창문 하나가 눈에 들어온다.');
+        await host('저 창문 보여요? 제가 여기서 처음 야근한 날부터, 매일 저 시간에 켜져 있어요.');
+        discover('window1');
+      } else if (n === 2) {
+        await host('저 창문 말이에요. 어느 날 처음으로 손을 흔들어 봤어요. 아무도 못 봤을 거라고 생각했는데요.');
+        await host('그날 불이 두 번 깜빡였어요. 우연일지도 몰라요. 근데 우연이어도 괜찮더라고요.');
+        discover('window2');
+      } else {
+        await host(n === 3 ? '당신도 한번 해볼래요? 저 창문에 손 흔들어 보는 거요.' : (S.waved ? '또 흔들어 볼까요?' : '손 한번 흔들어 볼래요?'));
+        const pick = await choose(['손을 흔든다', '조금 부끄러워요']);
+        if (pick === 0) {
+          await waveStory();
+          if (!S.waved) {
+            S.waved = true;
+            await host('봤죠? 방금 봤죠!');
+            await host('누군지는 몰라도, 같은 시간에 서로를 알아봐 주는 사람이 있다는 건... 그것만으로 하루가 다르게 끝나요.');
+            discover('window3');
+          } else {
+            await host('저 사람도 오늘 퇴근이 늦나 봐요.');
+          }
+        } else {
+          await host('그래요, 부끄러운 거 알아요. 그래도 저 창문은 늘 거기 있으니까요.');
+        }
+      }
+    },
+
+    async cup() {
+      attention = true;
+      if (count.cup === 1) {
+        await narrate('책상 위 머그잔에는 식은 커피가 반쯤 남아 있다.');
+        await host('그 커피, 식은 지 두 시간쯤 됐어요. 근데 이상하게 못 버리겠어요.');
+        await host('따뜻한 걸 마시면 하루가 끝나버릴 것 같아서요. 아직 끝내고 싶지 않은 하루가 있거든요.');
+        discover('cup1');
+        return;
+      }
+      if (S.cupWarm) {
+        await host('식기 전에 마셔야겠어요. 근데 아껴 마시고 싶어요.');
+        return;
+      }
+      await host('그 커피... 새로 내려다 줄래요? 이상하죠, 오늘은 누가 건네주는 커피가 마시고 싶어요.');
+      const pick = await choose(['제가 새로 내려 드릴게요', '다음에요']);
+      if (pick === 0) {
+        await narrate('탕비실에서 커피를 내려와 책상 위에 올려둔다. 김이 천천히 피어오른다.');
+        S.cupWarm = true;
+        cupTarget = 1;
+        await sleep(1200);
+        await host('...따뜻하네요.');
+        await host('같은 커피여도 누가 챙겨준 건 맛이 달라요. 이상하죠?');
+        discover('cup2');
+      } else {
+        await host('그래요, 언젠가 꼭요.');
+      }
+    },
+
+    async lamp() {
+      attention = true;
+      if (!S.lampDone) {
+        if (count.lamp === 1) {
+          await narrate('책상 끝의 스탠드가 낮게 윙 소리를 낸다.');
+          await host('이 스탠드, 제가 끄면 오늘 하루가 끝나요. 그래서 일부러 안 꺼요.');
+          await host('불을 끄면 보이는 게 있다던데, 해본 적은 없어요. 혼자 끄기엔 좀 무서워서요.');
+        } else {
+          await host('스탠드, 꺼볼래요?');
+        }
+        const pick = await choose(['제가 대신 꺼볼까요?', '그냥 두세요']);
+        if (pick === 0) {
+          await lampOffStory();
+          S.lampDone = true;
+          discover('lamp1');
+        } else {
+          await host('그래요. 아직은 켜둘래요.');
+        }
+        return;
+      }
+      if (!S.lampTalk) {
+        S.lampTalk = true;
+        await host('스탠드 불빛 아래서 쓴 글씨는 이상하게 따뜻해요. 그래서 편지는 꼭 여기서 써요.');
+        await host('당신에게도 그런 자리가 있어요? 유독 솔직해지는 곳이요.');
+        const pick = await choose(['저도 그런 곳이 있어요', '저는 그런 곳이 없어요']);
+        await host(pick === 0
+          ? '그런 곳이 있다는 건 좋은 거예요. 거긴 당신이 가장 솔직해지는 곳이니까요.'
+          : '그럼 오늘부터 여기를 그런 곳이라고 해요. 이 불빛 아래는 아무도 평가하지 않으니까요.');
+        discover('lamp2');
+        return;
+      }
+      await host('이 불빛 아래에서는, 이상하게 솔직해져요.');
+    },
+
+    async desks() {
+      const n = count.desks;
+      attention = true;
+      if (n === 1) {
+        await narrate('창가 쪽엔 빈 책상이 줄지어 있다. 모니터마다 대기 불빛만 깜빡인다.');
+        await host('저기 가운데 자리는 김 대리 자리였어요. 지난달에 퇴사했어요. 화분만 남아 있죠.');
+        await host('죽이지 말아 달라고 했는데, 저도 물 주는 걸 자꾸 까먹어요.');
+        const pick = await choose(['연락은 하세요?', '…화분에 물은 줬어요?']);
+        await host(pick === 0
+          ? '처음엔요. 지금은 안부를 묻는 것도 눈치가 보여요. 이상하죠, 매일 얼굴 보던 사람이었는데.'
+          : '오늘 아침에요. 근데 그 아이는 오늘따라 더 시들해 보였어요. 주인이 보고 싶은가 봐요.');
+        discover('desks1');
+      } else if (n === 2) {
+        await narrate('다른 책상 모니터에는 포스트잇이 붙어 있다. ‘먼저 들어가겠습니다. 죄송합니다.’');
+        await host('막내 자리예요. 늘 제일 먼저 퇴근하면서 미안하다고 했어요. 저는 그 인사가 이상하게 마음에 걸렸어요.');
+        await host('미안할 일이 아니었는데. 말해주지 못했어요. 일찍 가는 건 잘못이 아니라고.');
+        const pick = await choose(['지금이라도 말해주세요', '저도 비슷했어요']);
+        await host(pick === 0
+          ? '그러게요. 다음에 보면 꼭 해야겠어요. “먼저 가도 돼요. 오늘도 고생했어요.”라고.'
+          : '그랬군요. 그럼 오늘은 제가 대신 말할게요. 먼저 가도 괜찮아요. 미안해하지 않아도 돼요.');
+        discover('desks2');
+      } else if (n === 3) {
+        await narrate('세 번째 자리는 의자가 반쯤 뒤로 빠져 있다. 책상 위엔 오래된 커피 자국이 하나 있다.');
+        await host('부장님 자리예요. 저 불빛이 제일 늦게까지 켜져 있었어요. 열정이라고만 생각했는데.');
+        await host('나중에 알았어요. 집에 들어가기 싫어서 남아 있던 거였대요. 빈집이 무서워서요.');
+        await host('그 얘길 듣고, 그동안 인사도 제대로 못 한 게 마음에 걸렸어요.');
+        const pick = await choose(['누구에게나 그런 시간이 있죠', '지금이라도 안부를 전하고 싶어요']);
+        await host(pick === 0
+          ? '맞아요. 일이 많아서 남는 줄 알았던 불빛 중에는, 사실 갈 곳이 없어서 켜져 있던 불빛도 있었던 거예요.'
+          : '그 마음, 전해질 거예요. 다음에 오면 이 자리 앞에서 그 말, 같이 해봐요.');
+        discover('desks3');
+      } else {
+        await host('여기 앉아 있던 사람들, 모두 어디선가 오늘도 퇴근했겠죠.');
+      }
+    },
+
     async host() {
       attention = true;
       if (!S.talked) {
@@ -689,6 +977,7 @@
       }
       await talkMenu();
     },
+
     async drawer() {
       if (S.drawerDone) {
         await narrate('서랍은 비어 있다. 책상 위엔 접어둔 편지만 놓여 있다.');
@@ -742,6 +1031,7 @@
 
   async function intro() {
     locked = true;
+    renderFound(false);
     setIdle();
     await sleep(1400);
     await narrate('불이 하나만 켜진 야근 사무실. 키보드 소리가 조용히 들린다.');
